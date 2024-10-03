@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await FastCachedImageConfig.init(clearCacheAfter: const Duration(days: 15));
+  await FastCachedImagePlusConfig.init(clearCacheAfter: const Duration(days: 15));
 
   runApp(const MyApp());
 }
@@ -50,6 +50,7 @@ class _MyAppState extends State<MyApp> {
                       height: 150,
                       width: 150,
                       child: FastCachedImagePlus(
+                       // imageUniqueId: 1, If You Want Cache Using Image Unique Id Just Give Id Per Eeach Image As A default using url
                         url: url1,
                         fit: BoxFit.cover,
                         fadeInDuration: const Duration(seconds: 1),
@@ -104,7 +105,7 @@ class _MyAppState extends State<MyApp> {
                 ElevatedButton.icon(
                   onPressed: () async {
                     setState(() => isImageCached =
-                        FastCachedImageConfig.isCached(url: url1));
+                        FastCachedImagePlusConfig.isCached(url: url1));
                   },
                   icon: const Icon(Icons.check_circle),
                   label: const Text('Check Image Cache'),
@@ -119,7 +120,7 @@ class _MyAppState extends State<MyApp> {
                 const SizedBox(height: 12),
                 ElevatedButton.icon(
                   onPressed: () async {
-                    await FastCachedImageConfig.deleteCachedImage(url: url1);
+                    await FastCachedImagePlusConfig.deleteCachedImage(url: url1);
                     setState(() => log = 'Deleted image $url1');
                     await Future.delayed(
                         const Duration(seconds: 2), () => setState(() => log = null));
@@ -137,7 +138,7 @@ class _MyAppState extends State<MyApp> {
                 const SizedBox(height: 12),
                 ElevatedButton.icon(
                   onPressed: () async {
-                    await FastCachedImageConfig.clearAllCachedImages(
+                    await FastCachedImagePlusConfig.clearAllCachedImages(
                         showLog: true);
                     setState(() => log = 'All cached images deleted');
                     await Future.delayed(

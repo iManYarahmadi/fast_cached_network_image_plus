@@ -1,18 +1,21 @@
 
 # Fast Cached Network Image Plus
 
-A flutter package to cache network image fastly without native dependencies, with loader, error builder, and smooth fade transitions.
-You can also add beautiful loaders and percentage indicators with the total and download size of the image.
+A Flutter package that extends the functionality of Fast Cached Network Image to cache network images 
+quickly without native dependencies. This package introduces enhanced features, allowing you to save images 
+by URL along with a unique ID, ensuring that even if the URL changes, the image can still be cached effectively.
+With built-in loaders, error handling, and smooth fade transitions, it offers a seamless image caching experience.
+
+
 
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://pub.dev/packages/fast_cached_network_image)
-[![pub](https://img.shields.io/pub/v/fast_cached_network_image)](https://pub.dev/packages/fast_cached_network_image)
-[![dart](https://img.shields.io/badge/dart-pure%20dart-success)](https://pub.dev/packages/fast_cached_network_image)
+[![pub](https://img.shields.io/pub/v/fast_cached_network_image_plus)](https://pub.dev/packages/fast_cached_network_image_plus)
+[![dart](https://img.shields.io/badge/dart-pure%20dart-success)](https://pub.dev/packages/fast_cached_network_image_plus)
 
 ## Screenshots
 
-<img src="https://raw.githubusercontent.com/CHRISTOPANANJICKAL/fast_cached_network_image/main/gif%20images/fast-cache.gif" width="300" />
-<img src="https://raw.githubusercontent.com/CHRISTOPANANJICKAL/fast_cached_network_image/main/gif%20images/images-in-row.gif" width="300" />
+
 <img src="https://raw.githubusercontent.com/CHRISTOPANANJICKAL/fast_cached_network_image/main/gif%20images/fast%20cache%204.gif" width="300" />
 <img src="https://raw.githubusercontent.com/CHRISTOPANANJICKAL/fast_cached_network_image/main/gif%20images/image-with-shimmer.gif" width="300" />
 
@@ -24,7 +27,7 @@ Use the [shimmer](https://pub.dev/packages/shimmer) package for beautiful loadin
 ## Usage
 Import it
 ```dart
-import 'package:fast_cached_network_image/fast_cached_network_image.dart';
+import 'package:fast_cached_network_image_plus/fast_cached_network_image_plus.dart';
 ```
 
 Use [path_provider](https://pub.dev/packages/path_provider) to set a storage location for the db of images.
@@ -35,14 +38,14 @@ String storageLocation = (await getApplicationDocumentsDirectory()).path;
 
 Initialize the cache configuration
 ```dart
-await FastCachedImageConfig.init(subDir: storageLocation, clearCacheAfter: const Duration(days: 15));
+await FastCachedImagePlusConfig.init(subDir: storageLocation, clearCacheAfter: const Duration(days: 15));
 ```
 The clearCacheAfter property is used to set the Duration after with the cached image will be cleared. By default its set to 7 days, which means an image cached today will be deleted when you open the app after 7 days.
 
 Use it as a Widget
 
 ```dart
-child: FastCachedImage(url: url)
+child: FastCachedImagePlus(url: url)
 ```
 
 ## Properties
@@ -83,31 +86,37 @@ fadeInDuration property can be use to set the fadeInDuration between the loading
 
 
 ```dart
-FastCachedImageConfig.isCached(imageUrl: url));
+FastCachedImagePlusConfig.isCached(imageUrl: url));
+//Or If Cached Image Using Image Unique Id
+FastCachedImagePlusConfig.isCached(imageUniqueId: imageUniqueId));
+
 ```
 You can pass in a url to this method and check whether the image in the url is already cached.
 
 
 ```dart
-FastCachedImageConfig.deleteCachedImage(imageUrl: url);
+FastCachedImagePlusConfig.deleteCachedImage(imageUrl: url);
+//Or If Using Image Unique ID Instead Of Url For Caching
+FastCachedImagePlusConfig.deleteCachedImage(imageUniqueId: imageUniqueId);
+
 ```
 This method deletes the image with given url from cache.
 
 ```dart
-FastCachedImageConfig.clearAllCachedImages();
+FastCachedImagePlusConfig.clearAllCachedImages();
 ```
 This method removes all the cached images. This method can be used in situations such as user logout, where you need to
 clear all the images corresponding to the particular user.
 
 If an image had some errors while displaying, the image will be automatically re - downloaded when the image is requested again.
 
-FastCachedImage have all other default properties such as height, width etc. provided by flutter.
+FastCachedImagePlus have all other default properties such as height, width etc. provided by flutter.
 
 
 If you want to use an image from cache as image provider, use
 
 ```dart
-FastCachedImageProvider(url);
+FastCachedImagePlusProvider(url);
 ```
 
 
@@ -120,7 +129,7 @@ import 'package:flutter/material.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await FastCachedImageConfig.init(clearCacheAfter: const Duration(days: 15));
+  await FastCachedImagePlusConfig.init(clearCacheAfter: const Duration(days: 15));
 
   runApp(const MyApp());
 }
@@ -133,7 +142,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String url1 = 'https://www.sefram.com/images/products/photos/hi_res/7202.jpg';
+  String url1 =
+      'https://cdn-images-1.medium.com/v2/resize:fit:87/1*XrbUBnZb-Vp9jRDGqU-BXQ@2x.png';
 
   bool isImageCached = false;
   String? log;
@@ -141,120 +151,148 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        home: Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    height: 150,
-                    width: 150,
-                    child: FastCachedImage(
-                      url: url1,
-                      fit: BoxFit.cover,
-                      fadeInDuration: const Duration(seconds: 1),
-                      errorBuilder: (context, exception, stacktrace) {
-                        return Text(stacktrace.toString());
-                      },
-                      loadingBuilder: (context, progress) {
-                        return Container(
-                          color: Colors.yellow,
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              if (progress.isDownloading && progress.totalBytes != null)
-                                Text('${progress.downloadedBytes ~/ 1024} / ${progress.totalBytes! ~/ 1024} kb',
-                                    style: const TextStyle(color: Colors.red)),
-
-                              SizedBox(
-                                  width: 120,
-                                  height: 120,
-                                  child:
-                                  CircularProgressIndicator(color: Colors.red, value: progress.progressPercentage.value)),
-                            ],
-                          ),
-                        );
-                      },
+      home: Scaffold(
+        backgroundColor: Colors.grey[100],
+        appBar: AppBar(
+          title: const Text('Fast Cached Image Plus'),
+          centerTitle: true,
+          backgroundColor: Colors.deepPurple,
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Image inside a Card for beautiful design
+                Card(
+                  elevation: 5,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: SizedBox(
+                      height: 150,
+                      width: 150,
+                      child: FastCachedImagePlus(
+                        // imageUniqueId: 1, If You Want Cache Using Image Unique Id Just Give Id Per Eeach Image As A default using url
+                        url: url1,
+                        fit: BoxFit.cover,
+                        fadeInDuration: const Duration(seconds: 1),
+                        errorBuilder: (context, exception, stacktrace) {
+                          return const Center(
+                            child: Text('Failed to load image',
+                                style: TextStyle(color: Colors.red)),
+                          );
+                        },
+                        loadingBuilder: (context, progress) {
+                          return Container(
+                            color: Colors.grey[300],
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                if (progress.isDownloading &&
+                                    progress.totalBytes != null)
+                                  Text(
+                                      '${progress.downloadedBytes ~/ 1024} / ${progress.totalBytes! ~/ 1024} kb',
+                                      style:
+                                      const TextStyle(color: Colors.black)),
+                                SizedBox(
+                                  width: 60,
+                                  height: 60,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.deepPurple,
+                                    value: progress.progressPercentage.value,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
-
-                  const SizedBox(height: 12),
-
-                  Text('Is image cached? = $isImageCached', style: const TextStyle(color: Colors.red)),
-
-                  const SizedBox(height: 12),
-
-                  Text(log ?? ''),
-
-                  const SizedBox(height: 120),
-
-                  MaterialButton(
-                    onPressed: () async {
-                      setState(() => isImageCached = FastCachedImageConfig.isCached(imageUrl: url1));
-                    },
-                    child: const Text('check image is cached or not'),
+                ),
+                const SizedBox(height: 20),
+                // Cached image info
+                Text(
+                  'Is image cached? = $isImageCached',
+                  style: const TextStyle(
+                      fontSize: 16, color: Colors.deepPurpleAccent),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  log ?? '',
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                ),
+                const SizedBox(height: 20),
+                // Styled buttons
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    setState(() => isImageCached =
+                        FastCachedImagePlusConfig.isCached(url: url1));
+                  },
+                  icon: const Icon(Icons.check_circle),
+                  label: const Text('Check Image Cache'),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white, backgroundColor: Colors.deepPurple,
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12, horizontal: 24),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
                   ),
-
-                  const SizedBox(height: 12),
-
-                  MaterialButton(
-                    onPressed: () async {
-                      await FastCachedImageConfig.deleteCachedImage(imageUrl: url1);
-                      setState(() => log = 'deleted image $url1');
-                      await Future.delayed(const Duration(seconds: 2), () => setState(() => log = null));
-                    },
-                    child: const Text('delete cached image'),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    await FastCachedImagePlusConfig.deleteCachedImage(url: url1);
+                    setState(() => log = 'Deleted image $url1');
+                    await Future.delayed(
+                        const Duration(seconds: 2), () => setState(() => log = null));
+                  },
+                  icon: const Icon(Icons.delete),
+                  label: const Text('Delete Cached Image'),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white, backgroundColor: Colors.redAccent,
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12, horizontal: 24),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
                   ),
-
-                  const SizedBox(height: 12),
-
-                  MaterialButton(
-                    onPressed: () async {
-                      await FastCachedImageConfig.clearAllCachedImages();
-                      setState(() => log = 'All cached images deleted');
-                      await Future.delayed(const Duration(seconds: 2), () => setState(() => log = null));
-                    },
-                    child: const Text('delete all cached images'),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    await FastCachedImagePlusConfig.clearAllCachedImages(
+                        showLog: true);
+                    setState(() => log = 'All cached images deleted');
+                    await Future.delayed(
+                        const Duration(seconds: 2), () => setState(() => log = null));
+                  },
+                  icon: const Icon(Icons.clear_all),
+                  label: const Text('Clear All Cached Images'),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white, backgroundColor: Colors.orangeAccent,
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12, horizontal: 24),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
                   ),
-                ],
-              ),
-            )));
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
 
+
 ```
-
-Feel free to contribute and support.
-
-## Contributors 🤝
-
-Big thanks go to these wonderful people:
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<table>
-  <tbody>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/CHRISTOPANANJICKAL"><img src="https://avatars.githubusercontent.com/u/58786637?v=4" width="100px;" alt=""/><br /><sub><b>Author: Christo Pananjickal</b></sub></a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/woutervanwijk"><img src="https://avatars.githubusercontent.com/u/480348?v=4" width="100px;" alt=""/><br /><sub><b>Contributor: Wouter van Wijk</b></sub></a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/MerdanDev"><img src="https://avatars.githubusercontent.com/u/70772623?v=4" width="100px;" alt=""/><br /><sub><b>Contributor: Merdan Atamyradow</b></sub></a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/stevenosse"><img src="https://avatars.githubusercontent.com/u/33069233?v=4" width="100px;" alt=""/><br /><sub><b>Contributor: Steve</b></sub></a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/suyog-patil-21"><img src="https://avatars.githubusercontent.com/u/67726767?v=4" width="100px;" alt=""/><br /><sub><b>Contributor: Suyog Patil</b></sub></a></td>
-    </tr>
-  </tbody>
-</table>
-
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
-
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-
-
-
 
 ## Package on pub.dev
 
-[fast_cached_network_image](https://pub.dev/packages/fast_cached_network_image)
+[fast_cached_network_image_plus](https://pub.dev/packages/fast_cached_network_image_plus)
 
