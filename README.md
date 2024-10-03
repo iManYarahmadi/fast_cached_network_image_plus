@@ -16,7 +16,7 @@ With built-in loaders, error handling, and smooth fade transitions, it offers a 
 ## Screenshots
 
 
-<img src="https://jumpshare.com/s/9dOST7LpJDl9lvjJvSvA" width="600" />
+<img src="https://s8.uupload.ir/files/screen_recording_1403-07-12_at_16.14.59_(1)_3dyo.gif" width="600" />
 
 Use the [shimmer](https://pub.dev/packages/shimmer) package for beautiful loading widgets.
 
