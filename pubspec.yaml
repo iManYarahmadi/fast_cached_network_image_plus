@@ -1,0 +1,30 @@
+name: fast_cached_network_image_plus
+description: "A new Flutter package project."
+version: 0.0.1
+homepage:
+repository: https://github.com/iManYarahmadi/fast_cached_network_image_plus
+
+topics:
+  - cache
+  - image
+  - photo
+  - download
+  - network
+  
+environment:
+  sdk: '>=2.18.0 <3.24.3'
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  dio: ^5.4.0
+  hive_flutter: ^1.1.0
+  uuid: ^4.3.3
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+
+flutter:
