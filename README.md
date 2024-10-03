@@ -16,8 +16,7 @@ With built-in loaders, error handling, and smooth fade transitions, it offers a 
 ## Screenshots
 
 
-<img src="https://raw.githubusercontent.com/CHRISTOPANANJICKAL/fast_cached_network_image/main/gif%20images/fast%20cache%204.gif" width="300" />
-<img src="https://raw.githubusercontent.com/CHRISTOPANANJICKAL/fast_cached_network_image/main/gif%20images/image-with-shimmer.gif" width="300" />
+<img src="https://jumpshare.com/s/9dOST7LpJDl9lvjJvSvA" width="600" />
 
 Use the [shimmer](https://pub.dev/packages/shimmer) package for beautiful loading widgets.
 
@@ -231,6 +230,10 @@ class _MyAppState extends State<MyApp> {
                   onPressed: () async {
                     setState(() => isImageCached =
                         FastCachedImagePlusConfig.isCached(url: url1));
+                        //or
+                        // FastCachedImagePlusConfig.isCached(imageUniqueId:ImageUniqueId));
+
+
                   },
                   icon: const Icon(Icons.check_circle),
                   label: const Text('Check Image Cache'),
@@ -246,6 +249,9 @@ class _MyAppState extends State<MyApp> {
                 ElevatedButton.icon(
                   onPressed: () async {
                     await FastCachedImagePlusConfig.deleteCachedImage(url: url1);
+                    //or
+                    // FastCachedImagePlusConfig.deleteCachedImage(imageUniqueId:ImageUniqueId));
+
                     setState(() => log = 'Deleted image $url1');
                     await Future.delayed(
                         const Duration(seconds: 2), () => setState(() => log = null));

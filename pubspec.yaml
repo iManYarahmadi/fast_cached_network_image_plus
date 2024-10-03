@@ -1,5 +1,10 @@
 name: fast_cached_network_image_plus
-description: "A new Flutter package project."
+description: "A Flutter package that extends the functionality of
+Fast Cached Network Image to cache network images quickly without native dependencies.
+This package introduces enhanced features,
+ allowing you to save images by URL along with a unique ID, ensuring that even
+ if the URL changes, the image can still be cached effectively. With built-in loaders,
+  error handling, and smooth fade transitions, it offers a seamless image caching experience."
 version: 0.0.1
 homepage:
 repository: https://github.com/iManYarahmadi/fast_cached_network_image_plus
