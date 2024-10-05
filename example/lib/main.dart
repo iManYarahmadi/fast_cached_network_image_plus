@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await FastCachedImagePlusConfig.init(clearCacheAfter: const Duration(days: 15));
+  await FastCachedImagePlusConfig.init(
+      clearCacheAfter: const Duration(days: 15));
 
   runApp(const MyApp());
 }
@@ -26,6 +27,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Colors.grey[100],
         appBar: AppBar(
@@ -50,7 +52,9 @@ class _MyAppState extends State<MyApp> {
                       height: 150,
                       width: 150,
                       child: FastCachedImagePlus(
-                       // imageUniqueId: 1, If You Want Cache Using Image Unique Id Just Give Id Per Eeach Image As A default using url
+                        // imageUniqueName:"image1",
+                        // If You Want Cache Using Image Unique Name Just Giv Name Per Eeach Image :( As A default using url for cache)
+                        //You Can Use Id And Convert To String Using toString() Method
                         url: url1,
                         fit: BoxFit.cover,
                         fadeInDuration: const Duration(seconds: 1),
@@ -71,7 +75,7 @@ class _MyAppState extends State<MyApp> {
                                   Text(
                                       '${progress.downloadedBytes ~/ 1024} / ${progress.totalBytes! ~/ 1024} kb',
                                       style:
-                                      const TextStyle(color: Colors.black)),
+                                          const TextStyle(color: Colors.black)),
                                 SizedBox(
                                   width: 60,
                                   height: 60,
@@ -106,11 +110,14 @@ class _MyAppState extends State<MyApp> {
                   onPressed: () async {
                     setState(() => isImageCached =
                         FastCachedImagePlusConfig.isCached(url: url1));
+                    //or
+                    // FastCachedImagePlusConfig.isCached(imageUniqueName:imageUniqueName));
                   },
                   icon: const Icon(Icons.check_circle),
                   label: const Text('Check Image Cache'),
                   style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white, backgroundColor: Colors.deepPurple,
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.deepPurple,
                     padding: const EdgeInsets.symmetric(
                         vertical: 12, horizontal: 24),
                     shape: RoundedRectangleBorder(
@@ -120,15 +127,19 @@ class _MyAppState extends State<MyApp> {
                 const SizedBox(height: 12),
                 ElevatedButton.icon(
                   onPressed: () async {
-                    await FastCachedImagePlusConfig.deleteCachedImage(url: url1);
+                    await FastCachedImagePlusConfig.deleteCachedImage(
+                        url: url1);
+                    //or
+                    // await FastCachedImagePlusConfig.deleteCachedImage(imageUniqueName:imageUniqueName));
                     setState(() => log = 'Deleted image $url1');
-                    await Future.delayed(
-                        const Duration(seconds: 2), () => setState(() => log = null));
+                    await Future.delayed(const Duration(seconds: 2),
+                        () => setState(() => log = null));
                   },
                   icon: const Icon(Icons.delete),
                   label: const Text('Delete Cached Image'),
                   style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white, backgroundColor: Colors.redAccent,
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.redAccent,
                     padding: const EdgeInsets.symmetric(
                         vertical: 12, horizontal: 24),
                     shape: RoundedRectangleBorder(
@@ -141,13 +152,14 @@ class _MyAppState extends State<MyApp> {
                     await FastCachedImagePlusConfig.clearAllCachedImages(
                         showLog: true);
                     setState(() => log = 'All cached images deleted');
-                    await Future.delayed(
-                        const Duration(seconds: 2), () => setState(() => log = null));
+                    await Future.delayed(const Duration(seconds: 2),
+                        () => setState(() => log = null));
                   },
                   icon: const Icon(Icons.clear_all),
                   label: const Text('Clear All Cached Images'),
                   style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white, backgroundColor: Colors.orangeAccent,
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.orangeAccent,
                     padding: const EdgeInsets.symmetric(
                         vertical: 12, horizontal: 24),
                     shape: RoundedRectangleBorder(

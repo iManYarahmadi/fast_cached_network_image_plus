@@ -10,8 +10,8 @@ import 'package:uuid/uuid.dart';
 import 'models/fast_cache_progress_data.dart';
 
 class FastCachedImagePlus extends StatefulWidget {
-  ///Provide the [imageUniqueId] for the image to display.
-  final int? imageUniqueId;
+  ///Provide the [imageUniqueName] for the image to display.
+  final String? imageUniqueName;
 
   ///Provide the [url] for the image to display.
   final String url;
@@ -145,7 +145,7 @@ class FastCachedImagePlus extends StatefulWidget {
       this.cacheWidth,
       this.cacheHeight,
       super.key,
-      this.imageUniqueId});
+      this.imageUniqueName});
 
   @override
   State<FastCachedImagePlus> createState() => _FastCachedImagePlusState();
@@ -174,7 +174,7 @@ class _FastCachedImagePlusState extends State<FastCachedImagePlus>
         .animate(_animationController);
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      _loadAsync(widget.url, widget.headers, widget.imageUniqueId);
+      _loadAsync(widget.url, widget.headers, widget.imageUniqueName);
       _animationController
           .addStatusListener((status) => _animationListener(status));
     });
@@ -244,7 +244,7 @@ class _FastCachedImagePlusState extends State<FastCachedImagePlus>
                     _logErrors(c);
                     FastCachedImagePlusConfig.deleteCachedImage(
                         url: widget.url,
-                        uniqueImageId: widget.imageUniqueId!,
+                        imageUniqueName: widget.imageUniqueName!,
                         showLog: widget.showErrorLog);
                   }
                   return widget.errorBuilder != null
@@ -291,11 +291,11 @@ class _FastCachedImagePlusState extends State<FastCachedImagePlus>
   }
 
   ///[_loadAsync] Not public API.
-  Future<void> _loadAsync(
-      String url, Map<String, dynamic>? headers, int? imageUniqueId) async {
+  Future<void> _loadAsync(String url, Map<String, dynamic>? headers,
+      String? imageUniqueName) async {
     FastCachedImagePlusConfig._checkInit();
     Uint8List? image =
-        await FastCachedImagePlusConfig._getImage(imageUniqueId, url);
+        await FastCachedImagePlusConfig._getImage(imageUniqueName, url);
 
     if (!mounted) return;
 
@@ -367,7 +367,7 @@ class _FastCachedImagePlusState extends State<FastCachedImagePlus>
         if (widget.loadingBuilder == null) _animationController.forward();
       }
 
-      await FastCachedImagePlusConfig._saveImage(imageUniqueId, bytes, url);
+      await FastCachedImagePlusConfig._saveImage(imageUniqueName, bytes, url);
     } catch (e) {
       if (mounted) {
         setState(() => _imageResponse = _ImageResponse(
@@ -417,10 +417,11 @@ class FastCachedImagePlusConfig {
     await _clearOldCache(clearCacheAfter);
   }
 
-  static Future<Uint8List?> _getImage(int? imageUniqueId, String? url) async {
-    final key = _keyFromUrl(imageUniqueId, url);
+  static Future<Uint8List?> _getImage(
+      String? imageUniqueName, String? url) async {
+    final key = _keyFromUrl(imageUniqueName, url);
 
-    final identifier = imageUniqueId != null ? imageUniqueId.toString() : url;
+    final identifier = imageUniqueName ?? url;
 
     if (_imageKeyBox!.keys.contains(identifier) &&
         _imageBox!.containsKey(identifier)) {
@@ -444,8 +445,8 @@ class FastCachedImagePlusConfig {
 
   ///[_saveImage] is to save an image to cache. Not part of public API.
   static Future<void> _saveImage(
-      int? imageUniqueId, Uint8List image, String url) async {
-    final key = _keyFromUrl(imageUniqueId, url);
+      String? imageUniqueName, Uint8List image, String url) async {
+    final key = _keyFromUrl(imageUniqueName, url);
 
     await _imageKeyBox!.put(key, DateTime.now());
     await _imageBox!.put(key, image);
@@ -491,15 +492,16 @@ class FastCachedImagePlusConfig {
   ///[deleteCachedImage] function takes in a image [imageUrl] and removes the image corresponding to the url
   /// from the cache if the image is present in the cache.
   static Future<void> deleteCachedImage(
-      {int? uniqueImageId, bool showLog = true, String? url}) async {
+      {String? imageUniqueName, bool showLog = true, String? url}) async {
     _checkInit();
 
-    final key = _keyFromUrl(uniqueImageId, url);
+    final key = _keyFromUrl(imageUniqueName, url);
     if (_imageKeyBox!.keys.contains(key) && _imageBox!.keys.contains(key)) {
       await _imageKeyBox!.delete(key);
       await _imageBox!.delete(key);
       if (showLog) {
-        debugPrint('FastCacheImage: Removed image $uniqueImageId from cache.');
+        debugPrint(
+            'FastCacheImage: Removed image $imageUniqueName from cache.');
       }
     }
   }
@@ -548,18 +550,19 @@ class FastCachedImagePlusConfig {
   ///Returns true if cached, false if not.
   /// [isCached] returns a boolean indicating whether the given image is cached or not.
   /// Returns true if cached, false if not.
-  static bool isCached({int? imageUniqueId, String? url}) {
+  static bool isCached({String? imageUniqueName, String? url}) {
     _checkInit();
 
-    final key = _keyFromUrl(imageUniqueId, url);
+    final key = _keyFromUrl(imageUniqueName, url);
     if (_imageKeyBox!.containsKey(key) && _imageBox!.keys.contains(key)) {
       return true;
     }
     return false;
   }
 
-  static _keyFromUrl(int? imageUniqueId, String? url) {
-    final identifier = imageUniqueId != null ? imageUniqueId.toString() : url;
+  static _keyFromUrl(String? imageUniqueName, String? url) {
+    final identifier =
+        imageUniqueName != null ? imageUniqueName.toString() : url;
     return const Uuid().v5(Uuid.NAMESPACE_URL, identifier);
   }
 }
@@ -580,7 +583,7 @@ class FastCachedImagePlusProvider extends ImageProvider<NetworkImage>
   /// Creates an object that fetches the image at the given URL.
   ///
   /// The arguments [url] and [scale] must not be null.
-  const FastCachedImagePlusProvider(this.url, this.imageUniqueId,
+  const FastCachedImagePlusProvider(this.url, this.imageUniqueName,
       {this.scale = 1.0, this.headers});
 
   @override
@@ -592,10 +595,11 @@ class FastCachedImagePlusProvider extends ImageProvider<NetworkImage>
   @override
   final Map<String, String>? headers;
 
-  final int? imageUniqueId;
+  final String? imageUniqueName;
 
   @override
-  Future<FastCachedImagePlusProvider> obtainKey(ImageConfiguration configuration) {
+  Future<FastCachedImagePlusProvider> obtainKey(
+      ImageConfiguration configuration) {
     return SynchronousFuture<FastCachedImagePlusProvider>(this);
   }
 
@@ -606,7 +610,8 @@ class FastCachedImagePlusProvider extends ImageProvider<NetworkImage>
         StreamController<ImageChunkEvent>();
 
     return MultiFrameImageStreamCompleter(
-      codec: _loadAsync(key as FastCachedImagePlusProvider, chunkEvents, decode),
+      codec:
+          _loadAsync(key as FastCachedImagePlusProvider, chunkEvents, decode),
       chunkEvents: chunkEvents.stream,
       scale: key.scale,
       debugLabel: key.url,
@@ -627,7 +632,7 @@ class FastCachedImagePlusProvider extends ImageProvider<NetworkImage>
       Dio dio = Dio();
       FastCachedImagePlusConfig._checkInit();
       Uint8List? image =
-          await FastCachedImagePlusConfig._getImage(imageUniqueId!, url);
+          await FastCachedImagePlusConfig._getImage(imageUniqueName!, url);
       if (image != null) {
         final ui.ImmutableBuffer buffer =
             await ui.ImmutableBuffer.fromUint8List(image);
@@ -655,7 +660,7 @@ class FastCachedImagePlusProvider extends ImageProvider<NetworkImage>
 
       final ui.ImmutableBuffer buffer =
           await ui.ImmutableBuffer.fromUint8List(bytes);
-      await FastCachedImagePlusConfig._saveImage(imageUniqueId, bytes, url);
+      await FastCachedImagePlusConfig._saveImage(imageUniqueName, bytes, url);
       return decode(buffer);
     } catch (e) {
       // Depending on where the exception was thrown, the image cache may not

@@ -82,8 +82,9 @@ fadeInDuration property can be use to set the fadeInDuration between the loading
 
 ```dart
 FastCachedImagePlusConfig.isCached(imageUrl: url));
-//Or If Cached Image Using Image Unique Id
-FastCachedImagePlusConfig.isCached(imageUniqueId: imageUniqueId));
+//Or If You want Cached Image With Image Unique Name Using Below Snippet Code
+// If Want Using Int for Unique Name just add toString() method and use it
+FastCachedImagePlusConfig.isCached(imageUniqueName: imageUniqueName));
 
 ```
 You can pass in a url to this method and check whether the image in the url is already cached.
@@ -91,8 +92,8 @@ You can pass in a url to this method and check whether the image in the url is a
 
 ```dart
 FastCachedImagePlusConfig.deleteCachedImage(imageUrl: url);
-//Or If Using Image Unique ID Instead Of Url For Caching
-FastCachedImagePlusConfig.deleteCachedImage(imageUniqueId: imageUniqueId);
+//Or If Using Image Unique Name Instead Of Url For Caching
+FastCachedImagePlusConfig.deleteCachedImage(imageUniqueName: imageUniqueName);
 
 ```
 This method deletes the image with given url from cache.
@@ -170,7 +171,9 @@ class _MyAppState extends State<MyApp> {
                       height: 150,
                       width: 150,
                       child: FastCachedImagePlus(
-                        // imageUniqueId: 1, If You Want Cache Using Image Unique Id Just Give Id Per Eeach Image As A default using url
+                        // imageUniqueName:"image1",
+                        // If You Want Cache Using Image Unique Name Just Giv Name Per Eeach Image :( As A default using url for cache)
+                        //You Can Use Id And Convert To String Using toString() Method 
                         url: url1,
                         fit: BoxFit.cover,
                         fadeInDuration: const Duration(seconds: 1),
@@ -227,7 +230,7 @@ class _MyAppState extends State<MyApp> {
                     setState(() => isImageCached =
                         FastCachedImagePlusConfig.isCached(url: url1));
                         //or
-                        // FastCachedImagePlusConfig.isCached(imageUniqueId:ImageUniqueId));
+                        // FastCachedImagePlusConfig.isCached(imageUniqueName:imageUniqueName));
 
 
                   },
@@ -246,7 +249,7 @@ class _MyAppState extends State<MyApp> {
                   onPressed: () async {
                     await FastCachedImagePlusConfig.deleteCachedImage(url: url1);
                     //or
-                    // FastCachedImagePlusConfig.deleteCachedImage(imageUniqueId:ImageUniqueId));
+                    // FastCachedImagePlusConfig.deleteCachedImage(imageUniqueName:imageUniqueName));
 
                     setState(() => log = 'Deleted image $url1');
                     await Future.delayed(
